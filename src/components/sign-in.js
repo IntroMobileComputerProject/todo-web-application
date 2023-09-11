@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react'; // Added this line
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
@@ -18,6 +17,9 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff'; // Adjusted to v5
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
+import { Alert } from '@mui/material';
+import { Snackbar, Button } from '@mui/material';
+
 
 const theme = createTheme();
 export default function SignIn() {
@@ -26,7 +28,22 @@ export default function SignIn() {
   let [username, setUsername] = useState("");
   let [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarType, setSnackbarType] = useState('');
+  const handleOpenSnackbar = (message, type) => {
+    setSnackbarMessage(message);
+    setSnackbarType(type);
+    setOpenSnackbar(true);
+  };
 
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -44,11 +61,13 @@ export default function SignIn() {
       }
     )
       .then((response) => {
+        handleOpenSnackbar("login successfully!", 'success');
         setCookie('token', response.data.token);
         navigate('/main');
         console.log(response.data.token);
       })
       .catch((error) => {
+        handleOpenSnackbar("login fail!", 'error');
         if (error.code === 'ECONNABORTED') {
           console.log('timeout')
         } else if (error.response) { // Checking if error.response exists to avoid potential issues
@@ -60,6 +79,7 @@ export default function SignIn() {
   }
 
   return (
+    <div>
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
@@ -114,11 +134,6 @@ export default function SignIn() {
                 )
               }}
             />
-
-            {/* <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            /> */}
             <Button
               type="submit"
               fullWidth
@@ -130,6 +145,11 @@ export default function SignIn() {
             </Button>
 
             <Grid container>
+              <Grid item xs>
+                <Link href="forget-password" variant="body2">
+                  Forgot password?
+                </Link>
+              </Grid>
               <Grid item>
                 <Link href="signup" variant="body2">
                   {"Don't have an account? Sign Up"}
@@ -138,8 +158,19 @@ export default function SignIn() {
             </Grid>
           </Box>
         </Box>
-        {/* <Copyright sx={{ mt: 8, mb: 4 }} /> */}
       </Container>
+      
     </ThemeProvider >
+    <Snackbar
+    open={openSnackbar}
+    autoHideDuration={6000}
+    onClose={handleCloseSnackbar}
+    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+>
+    <Alert variant='filled' onClose={handleCloseSnackbar} severity={snackbarType}>
+        {snackbarMessage}
+    </Alert>
+</Snackbar>
+    </div>
   );
 }
