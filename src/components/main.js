@@ -54,13 +54,13 @@ function Main() {
         ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
         ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
     }
+    let [cookies, setCookie] = useCookies(['token']);
+    let [activity, setActivity] = useState([{}]);
+    const [selectedDate, handleDateChange] = useState(new Date());
     const [mycolumns, setMyColumns] = useState([
         { title: 'Activities', field: 'activityName', initialEditValue: 'Activity Name' },
         { title: 'Date/Time', field: 'activitiesTime', type: 'datetime', initialEditValue: selectedDate, render: rowData => moment(rowData.activitiesTime).format('D MMM YY เวลา HH:mm น.') },
     ]);
-    let [cookies, setCookie] = useCookies(['token']);
-    let [activity, setActivity] = useState([{}]);
-    const [selectedDate, handleDateChange] = useState(new Date());
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarType, setSnackbarType] = useState('');
